@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="OwinExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegexRouter.cs" />
     <Compile Include="SimpleBlog.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

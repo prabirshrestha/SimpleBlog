@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Owin.Extensions
+namespace SimpleBlog
 {
     using AppFunc = Func<IDictionary<string, object>, Task>;
 
