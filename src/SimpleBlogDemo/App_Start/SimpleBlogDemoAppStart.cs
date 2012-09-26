@@ -10,7 +10,7 @@ namespace SimpleBlogDemo.App_Start
     {
         public static void Initialize()
         {
-            ISimpleBlogService service = null;
+            var service = new FileSystemBlogService();
             var blogApp = SimpleBlog.App(service);
 
             RouteTable.Routes.Add(new Route("{*pathInfo}", new SimpleOwinAspNetRouteHandler(blogApp)));
