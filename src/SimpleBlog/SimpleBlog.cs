@@ -12,14 +12,15 @@
 
             var router = new RegexRouter(app);
 
-            router.Get(@"^\/()$", Renderers.Index());
-            router.Get(@"^\/()feed.(?<type>xml|json|js)$", Renderers.Feed());
-            router.Get(@"^\/([a-f0-9]{40})\/([a-z0-9_-]+)$", Renderers.Article());
-            router.Get(@"^\/([a-f0-9]{40})\/(.+\.[a-z]{2,4})$", Renderers.StaticFile());
-            router.Get(@"^\/()([a-z0-9_-]+)$", Renderers.Article());
-            router.Get(@"^\/()(.+\.[a-z]{2,4})$", Renderers.StaticFile());
-            router.Get(@"^\/()category\/([\%\.a-z0-9_-]+)$", Renderers.Category());
-            router.All(@"*", Renderers.NotFound());
+            var renderers = new Renderers();
+            router.Get(@"^\/()$", renderers.Index);
+            router.Get(@"^\/()feed.(?<type>xml|json|js)$", renderers.Feed);
+            router.Get(@"^\/([a-f0-9]{40})\/([a-z0-9_-]+)$", renderers.Article);
+            router.Get(@"^\/([a-f0-9]{40})\/(.+\.[a-z]{2,4})$", renderers.StaticFile);
+            router.Get(@"^\/()([a-z0-9_-]+)$", renderers.Article);
+            router.Get(@"^\/()(.+\.[a-z]{2,4})$", renderers.StaticFile);
+            router.Get(@"^\/()category\/([\%\.a-z0-9_-]+)$", renderers.Category);
+            router.All(@"*", renderers.NotFound);
 
             return app.ToOwinApp();
         }

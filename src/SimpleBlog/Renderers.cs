@@ -1,16 +1,14 @@
 ﻿namespace SimpleBlog
 {
-    using System;
-    using Stream;
     using Extensions;
+    using Stream;
     using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
 
     class Renderers
     {
-        public static Func<AppFunc, AppFunc> Index()
+        public AppFunc Index(AppFunc next)
         {
             return
-                next =>
                 async env =>
                 {
                     await env.GetResponseBody()
@@ -18,9 +16,9 @@
                 };
         }
 
-        public static Func<AppFunc, AppFunc> Feed()
+        public AppFunc Feed(AppFunc next)
         {
-            return next =>
+            return
                    async env =>
                    {
                        // http://rssjs.org/
@@ -32,10 +30,9 @@
                    };
         }
 
-        public static Func<AppFunc, AppFunc> Article()
+        public AppFunc Article(AppFunc next)
         {
             return
-                next =>
                 async env =>
                 {
                     await env.GetResponseBody()
@@ -43,10 +40,9 @@
                 };
         }
 
-        public static Func<AppFunc, AppFunc> StaticFile()
+        public AppFunc StaticFile(AppFunc next)
         {
             return
-                next =>
                 async env =>
                 {
                     await env.GetResponseBody()
@@ -54,10 +50,9 @@
                 };
         }
 
-        public static Func<AppFunc, AppFunc> Category()
+        public AppFunc Category(AppFunc next)
         {
             return
-                next =>
                 async env =>
                 {
                     await env.GetResponseBody()
@@ -65,10 +60,9 @@
                 };
         }
 
-        public static Func<AppFunc, AppFunc> NotFound()
+        public AppFunc NotFound(AppFunc next)
         {
             return
-                next =>
                 async env =>
                 {
                     env.SetResponseStatusCode(404);
