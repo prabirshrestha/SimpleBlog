@@ -6,6 +6,13 @@
 
     class Renderers
     {
+        private readonly ISimpleBlogService service;
+
+        public Renderers(ISimpleBlogService service)
+        {
+            this.service = service;
+        }
+
         public AppFunc Index(AppFunc next)
         {
             return
@@ -28,6 +35,16 @@
                        await env.GetResponseBody()
                            .WriteStringAsync("feed " + type);
                    };
+        }
+
+        public AppFunc Robots(AppFunc arg)
+        {
+            return
+                async env =>
+                {
+                    await env.GetResponseBody()
+                        .WriteStringAsync("robots.txt");
+                };
         }
 
         public AppFunc Article(AppFunc next)
