@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Blog.cs" />
     <Compile Include="FileSystemBlogService.cs" />
     <Compile Include="ISimpleBlogService.cs" />
     <Compile Include="OwinExtensions.cs" />
