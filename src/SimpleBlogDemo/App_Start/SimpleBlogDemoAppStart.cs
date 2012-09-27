@@ -3,6 +3,7 @@
 
 namespace SimpleBlogDemo.App_Start
 {
+    using System.Web.Hosting;
     using System.Web.Routing;
     using SimpleBlog;
 
@@ -10,7 +11,7 @@ namespace SimpleBlogDemo.App_Start
     {
         public static void Initialize()
         {
-            var service = new FileSystemBlogService();
+            var service = new FileSystemBlogService(HostingEnvironment.MapPath("~/App_Data"));
             var blogApp = SimpleBlog.App(service);
 
             RouteTable.Routes.Add(new Route("{*pathInfo}", new SimpleOwinAspNetRouteHandler(blogApp)));

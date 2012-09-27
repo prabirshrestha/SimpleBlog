@@ -1,5 +1,7 @@
 ﻿namespace SimpleBlog
 {
+    using System.Collections.Generic;
+    using System.Dynamic;
     using Extensions;
     using Stream;
     using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
@@ -7,19 +9,45 @@
     class Renderers
     {
         private readonly ISimpleBlogService service;
+        private readonly RazorEngine.Templating.ITemplateService template;
 
         public Renderers(ISimpleBlogService service)
         {
             this.service = service;
+            this.template = new RazorEngine.Templating.TemplateService();
         }
 
         public AppFunc Index(AppFunc next)
         {
+            const string templateName = "index";
+            this.template.Compile(service.GetIndexTemplate(), typeof(DynamicObject), templateName);
+
             return
                 async env =>
                 {
+                    env.GetRequestHeaders()
+                        .SetHeader("content-type", "text/html");
+
+                    var blog = this.service.GetBlog();
+
+                    int totalPosts;
+                    var posts = this.service.GetPosts(1, blog.ArticlesCountPerPage, out totalPosts);
+
+                    var model = new
+                                    {
+                                        Blog = blog,
+                                        Url = new
+                                                  {
+                                                      RequestPathBase = env.GetRequestPathBase(),
+                                                      RequestPath = env.GetRequestPath()
+                                                  }.ToDynamicObject(),
+                                        Posts = posts
+                                    };
+
+                    string html = this.template.Run(templateName, model.ToDynamicObject());
+
                     await env.GetResponseBody()
-                        .WriteStringAsync("index");
+                        .WriteStringAsync(html);
                 };
         }
 

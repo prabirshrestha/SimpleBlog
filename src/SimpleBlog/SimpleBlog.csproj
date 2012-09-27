@@ -50,10 +50,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Blog.cs" />
+    <Compile Include="Article.cs" />
     <Compile Include="FileSystemBlogService.cs" />
     <Compile Include="ISimpleBlogService.cs" />
     <Compile Include="OwinExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReflectionDynamicObject.cs" />
     <Compile Include="RegexRouter.cs" />
     <Compile Include="Renderers.cs" />
     <Compile Include="SimpleBlog.cs" />
