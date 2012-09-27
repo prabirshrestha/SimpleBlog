@@ -9,5 +9,7 @@
         Blog GetBlog();
 
         IList<Article> GetPosts(int pageIndex, int pageSize, out int totalPosts);
+
+        string TransformContent(string input);
     }
 }

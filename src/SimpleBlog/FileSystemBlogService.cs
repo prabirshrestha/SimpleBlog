@@ -6,11 +6,13 @@ namespace SimpleBlog
     using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using MarkdownDeep;
 
     public class FileSystemBlogService : ISimpleBlogService
     {
         private readonly string path;
         private readonly Regex markdownHeaderRegex = new Regex(@"^(\w+):\s*(.*)\s*\n", RegexOptions.Compiled | RegexOptions.Multiline);
+        private readonly Markdown markdown = new Markdown();
 
         public FileSystemBlogService(string path)
         {
@@ -60,6 +62,11 @@ namespace SimpleBlog
             return articles;
         }
 
+        public virtual string TransformContent(string input)
+        {
+            return this.markdown.Transform(input);
+        }
+
         private IDictionary<string, string> PreProcessHeaders(string contents, out string body)
         {
             var match = this.markdownHeaderRegex.Match(contents);
@@ -74,6 +81,7 @@ namespace SimpleBlog
             }
 
             body = contents.Substring(length);
+            body = this.TransformContent(body);
             return matched;
         }
 
