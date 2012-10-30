@@ -1,6 +1,5 @@
 ﻿namespace SimpleBlog
 {
-    using System.Collections.Generic;
     using System.Dynamic;
     using Extensions;
     using Stream;
@@ -25,9 +24,6 @@
             return
                 async env =>
                 {
-                    env.GetRequestHeaders()
-                        .SetHeader("content-type", "text/html");
-
                     var blog = this.service.GetBlog();
 
                     int totalPosts;
@@ -45,6 +41,9 @@
                                     };
 
                     string html = this.template.Run(templateName, model.ToDynamicObject());
+
+                    env.GetResponseHeaders()
+                        .SetHeader("content-type", "text/html");
 
                     await env.GetResponseBody()
                         .WriteStringAsync(html);
@@ -70,6 +69,9 @@
             return
                 async env =>
                 {
+                    env.GetResponseHeaders()
+                        .SetHeader("content-type", "text/plain");
+
                     await env.GetResponseBody()
                         .WriteStringAsync("robots.txt");
                 };
