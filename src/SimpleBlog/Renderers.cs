@@ -82,6 +82,9 @@
             return
                 async env =>
                 {
+                    env.GetResponseHeaders()
+                        .SetHeader("content-type", "text/html");
+
                     await env.GetResponseBody()
                         .WriteStringAsync("article");
                 };
