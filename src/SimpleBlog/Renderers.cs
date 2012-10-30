@@ -105,6 +105,9 @@
             return
                 async env =>
                 {
+                    env.GetResponseHeaders()
+                        .SetHeader("content-type", "text/html");
+
                     await env.GetResponseBody()
                         .WriteStringAsync("category");
                 };
@@ -115,6 +118,9 @@
             return
                 async env =>
                 {
+                    env.GetResponseHeaders()
+                        .SetHeader("content-type", "text/html");
+
                     env.SetResponseStatusCode(404);
 
                     await env.GetResponseBody()
