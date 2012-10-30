@@ -59,6 +59,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\skin\public\favicon.ico" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -68,6 +69,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="App_Data\articles\welcome.markdown" />
+    <Content Include="App_Data\authors\Prabir Shrestha.markdown" />
+    <Content Include="App_Data\description.markdown" />
+    <Content Include="App_Data\skin\article.cshtml" />
+    <Content Include="App_Data\skin\index.cshtml" />
+    <Content Include="App_Data\skin\_layout.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -80,6 +87,9 @@
       <Project>{62bd9dd3-acda-40b1-8b7e-e61d0f834bde}</Project>
       <Name>SimpleBlog</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\articles\welcome\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

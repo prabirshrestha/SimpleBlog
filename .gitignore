@@ -1,7 +1,6 @@
 # Visual Studio Ignores
 [Bb]in/
 obj/
-App_Data/
 
 *.sln.cache
 *.suo
