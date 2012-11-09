@@ -61,8 +61,23 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\skin\public\favicon.ico" />
     <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Data\**\dummycsprojwildcardhack" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Data\articles\welcome.markdown" />
+    <Content Include="App_Data\authors\Prabir Shrestha.markdown" />
+    <Content Include="App_Data\Copy of skin\article.cshtml" />
+    <Content Include="App_Data\Copy of skin\index.cshtml" />
+    <Content Include="App_Data\Copy of skin\public\favicon.ico" />
+    <Content Include="App_Data\Copy of skin\_layout.cshtml" />
+    <Content Include="App_Data\description.markdown" />
+    <Content Include="App_Data\skin\article.cshtml" />
+    <Content Include="App_Data\skin\index.cshtml" />
+    <Content Include="App_Data\skin\public\favicon.ico" />
+    <Content Include="App_Data\skin\_layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\SimpleBlogDemoAppStart.cs" />
@@ -71,12 +86,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
-    <Content Include="App_Data\articles\welcome.markdown" />
-    <Content Include="App_Data\authors\Prabir Shrestha.markdown" />
-    <Content Include="App_Data\description.markdown" />
-    <Content Include="App_Data\skin\article.cshtml" />
-    <Content Include="App_Data\skin\index.cshtml" />
-    <Content Include="App_Data\skin\_layout.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -90,9 +99,7 @@
       <Name>SimpleBlog</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\articles\welcome\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
