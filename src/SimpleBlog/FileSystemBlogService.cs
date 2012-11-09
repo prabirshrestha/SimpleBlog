@@ -50,10 +50,10 @@ namespace SimpleBlog
                 article.Slug = Path.GetFileNameWithoutExtension(articlePath);
 
                 string body;
-                article.Headers = PreProcessHeaders(File.ReadAllText(articlePath), out body);
+                article.Metadata = PreProcessMetadata(File.ReadAllText(articlePath), out body);
                 article.Content = body;
 
-                article.Title = GetStringValue(article.Headers, "Title") ?? article.Slug;
+                article.Title = GetStringValue(article.Metadata, "Title") ?? article.Slug;
 
                 articles.Add(article);
             }
@@ -67,7 +67,7 @@ namespace SimpleBlog
             return this.markdown.Transform(input);
         }
 
-        private IDictionary<string, string> PreProcessHeaders(string contents, out string body)
+        private IDictionary<string, string> PreProcessMetadata(string contents, out string body)
         {
             var match = this.markdownHeaderRegex.Match(contents);
 

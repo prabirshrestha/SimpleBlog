@@ -8,6 +8,6 @@
         public string Slug { get; set; }
         public string Content { get; set; }
 
-        public IDictionary<string, string> Headers { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
     }
 }
