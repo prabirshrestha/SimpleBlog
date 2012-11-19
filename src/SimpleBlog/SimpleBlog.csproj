@@ -98,12 +98,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CassetteConfiguration.cs" />
+    <Compile Include="Models\BlogModel.cs" />
     <Compile Include="Modules\ArticleModule.cs" />
     <Compile Include="Modules\CategoryModule.cs" />
     <Compile Include="Modules\FeedModule.cs" />
     <Compile Include="Modules\HomeModule.cs" />
     <Compile Include="Modules\RobotsModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service\ISimpleBlogService.cs" />
+    <Compile Include="Service\SimpleBlogFileSystemService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

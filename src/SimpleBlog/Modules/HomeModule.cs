@@ -1,12 +1,13 @@
 ﻿namespace SimpleBlog.Modules
 {
     using Nancy;
+    using SimpleBlog.Service;
 
     public class HomeModule : NancyModule
     {
-        public HomeModule()
+        public HomeModule(ISimpleBlogService blogService)
         {
-            Get["/"] = 
+            Get["/"] =
                 _ => "Welcome to SimpleBlog!";
         }
     }
