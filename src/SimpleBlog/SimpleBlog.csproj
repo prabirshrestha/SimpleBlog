@@ -50,6 +50,9 @@
     <Reference Include="Cassette.Nancy">
       <HintPath>..\packages\Cassette.Nancy.2.0.0\lib\net40\Cassette.Nancy.dll</HintPath>
     </Reference>
+    <Reference Include="MarkdownDeep">
+      <HintPath>..\packages\MarkdownDeep.NET.1.5\lib\.NetFramework 3.5\MarkdownDeep.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Nancy">
       <HintPath>..\packages\Nancy.0.13.0\lib\net40\Nancy.dll</HintPath>
