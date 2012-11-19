@@ -100,6 +100,7 @@
     <Compile Include="CassetteConfiguration.cs" />
     <Compile Include="Modules\FeedModule.cs" />
     <Compile Include="Modules\HomeModule.cs" />
+    <Compile Include="Modules\RobotsModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
