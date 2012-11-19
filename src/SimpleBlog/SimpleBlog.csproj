@@ -98,6 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CassetteConfiguration.cs" />
+    <Compile Include="Modules\CategoryModule.cs" />
     <Compile Include="Modules\FeedModule.cs" />
     <Compile Include="Modules\HomeModule.cs" />
     <Compile Include="Modules\RobotsModule.cs" />
