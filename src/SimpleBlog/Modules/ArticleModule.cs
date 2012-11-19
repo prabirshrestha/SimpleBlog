@@ -8,6 +8,9 @@
         {
             Get["/{article}"] =
                 x => "article " + x.article;
+
+            Get["/{article}/{file}"] =
+                x => "article file " + x.article + " " + x.file;
         }
     }
 }
