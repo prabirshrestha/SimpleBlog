@@ -106,6 +106,7 @@
     <Content Include="assets\javascripts\header.js" />
     <Content Include="assets\javascripts\main.js" />
     <Content Include="assets\javascripts\_vendors\jquery.js" />
+    <None Include="assets\stylesheets\main.less" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -125,6 +126,7 @@
     <Content Include="Views\index.cshtml" />
     <Content Include="Views\_layout.cshtml" />
     <Content Include="assets\stylesheets\style.less" />
+    <Content Include="assets\stylesheets\print.less" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
