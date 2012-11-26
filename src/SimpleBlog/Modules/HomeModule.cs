@@ -8,7 +8,19 @@
         public HomeModule(ISimpleBlogService blogService)
         {
             Get["/"] =
-                _ => "Welcome to SimpleBlog!";
+                _ =>
+                {
+                    var blog = blogService.GetBlog();
+                    if (blog == null)
+                    {
+                        return 404;
+                    }
+
+                    dynamic model = new DynamicDictionary();
+                    model.Blog = blog;
+
+                    return View["index", model];
+                };
         }
     }
 }

@@ -5,5 +5,7 @@
     public interface ISimpleBlogService
     {
         BlogModel GetBlog();
+
+        string TransformContent(string input);
     }
 }
