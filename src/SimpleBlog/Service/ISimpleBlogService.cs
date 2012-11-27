@@ -1,10 +1,10 @@
 ﻿namespace SimpleBlog.Service
 {
-    using SimpleBlog.Models;
 
     public interface ISimpleBlogService
     {
-        BlogModel GetBlog();
+        dynamic GetBlog();
+        dynamic GetArticles(int pageIndex, int pageSize, out long totalCount);
 
         string TransformContent(string input);
     }

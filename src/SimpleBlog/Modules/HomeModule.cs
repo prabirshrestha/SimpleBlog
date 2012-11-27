@@ -1,5 +1,6 @@
 ﻿namespace SimpleBlog.Modules
 {
+    using System;
     using Nancy;
     using SimpleBlog.Service;
 
@@ -11,13 +12,13 @@
                 _ =>
                 {
                     var blog = blogService.GetBlog();
-                    if (blog == null)
-                    {
-                        return 404;
-                    }
 
-                    dynamic model = new DynamicDictionary();
-                    model.Blog = blog;
+                    long totalArticles;
+
+                    dynamic model = new JsonObject();
+                    model.blog = blog;
+                    model.articles = blogService.GetArticles(1, Convert.ToInt32(blog.articleCountPerPage),out totalArticles);
+                    model.totalArticlesCount = totalArticles;
 
                     return View["index", model];
                 };

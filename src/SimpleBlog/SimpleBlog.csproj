@@ -27,7 +27,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;SIMPLE_JSON_INTERNAL;SIMPLE_JSON_OBJARRAYINTERNAL;SIMPLE_JSON_DYNAMIC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -35,7 +35,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;SIMPLE_JSON_INTERNAL;SIMPLE_JSON_OBJARRAYINTERNAL;SIMPLE_JSON_DYNAMIC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -106,12 +106,11 @@
     <Content Include="assets\javascripts\header.js" />
     <Content Include="assets\javascripts\main.js" />
     <Content Include="assets\javascripts\_vendors\jquery.js" />
-    <None Include="assets\stylesheets\main.less" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bootstrapper.cs" />
     <Compile Include="CassetteConfiguration.cs" />
-    <Compile Include="Models\BlogModel.cs" />
     <Compile Include="Modules\ArticleModule.cs" />
     <Compile Include="Modules\CategoryModule.cs" />
     <Compile Include="Modules\FeedModule.cs" />
@@ -120,13 +119,23 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\ISimpleBlogService.cs" />
     <Compile Include="Service\SimpleBlogFileSystemService.cs" />
+    <Compile Include="SimpleJson.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\**\dummycsprojwildcardhack" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Data\articles\welcome.markdown" />
+    <Content Include="App_Data\authors\Prabir Shrestha.markdown" />
+    <None Include="App_Data\blog" />
+    <Content Include="App_Data\skin\article.cshtml" />
+    <Content Include="App_Data\skin\index.cshtml" />
+    <Content Include="App_Data\skin\public\favicon.ico" />
+    <Content Include="App_Data\skin\_layout.cshtml" />
     <Content Include="packages.config" />
     <Content Include="Views\index.cshtml" />
     <Content Include="Views\_layout.cshtml" />
     <Content Include="assets\stylesheets\style.less" />
-    <Content Include="assets\stylesheets\print.less" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -1,4 +1,7 @@
 ﻿@{
     Layout = "_layout.cshtml";
 }
-index
+@foreach (var article in Model.articles) {
+    <h2>@article.title</h2>
+    @Html.Raw(article.content)
+}

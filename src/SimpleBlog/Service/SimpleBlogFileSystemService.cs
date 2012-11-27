@@ -1,17 +1,20 @@
 ﻿namespace SimpleBlog.Service
 {
-    using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Text.RegularExpressions;
     using MarkdownDeep;
     using Nancy;
-    using SimpleBlog.Models;
+    using System.Linq;
 
     public class SimpleBlogFileSystemService : ISimpleBlogService
     {
-        private readonly string path;
+        private readonly string rootPath;
         private readonly Regex markdownHeaderRegex = new Regex(@"^(\w+):\s*(.*)\s*\n", RegexOptions.Compiled | RegexOptions.Multiline);
         private readonly Markdown markdown = new Markdown();
+
+        private readonly dynamic blog;
+        private IList<dynamic> articles;
 
         public SimpleBlogFileSystemService(IRootPathProvider rootPathProvider)
             : this(System.IO.Path.Combine(rootPathProvider.GetRootPath(), "App_Data"))
@@ -20,27 +23,53 @@
 
         public SimpleBlogFileSystemService(string path)
         {
-            this.path = path;
+            this.rootPath = path;
+
+            string body;
+            this.blog = this.PreProcessMetadata(ReadFile(CombinePath(this.rootPath, "blog")), out body);
+
+            this.articles = this.GetArticles();
+        }
+
+        private dynamic GetArticles()
+        {
+            var articlesFolder = CombinePath(this.rootPath, "articles");
+            var files = Directory.GetFiles(articlesFolder, "*.markdown");
+
+            var articles = new JsonArray();
+            foreach (var file in files)
+            {
+                string content;
+                var metadata = PreProcessMetadata(ReadFile(file), out content);
+                metadata["content"] = content;
+                articles.Add(metadata);
+            }
+
+            return articles;
         }
 
         public string Path
         {
-            get { return this.path; }
+            get { return this.rootPath; }
         }
 
-        public BlogModel GetBlog()
+        public dynamic GetBlog()
         {
-            var blog = new BlogModel();
-            blog.Title = "SimpleBlog";
-            ;
             return blog;
         }
 
-        public IDictionary<string, string> PreProcessMetadata(string contents, out string body)
+        public dynamic GetArticles(int pageIndex, int pageSize, out long totalCount)
+        {
+            totalCount = this.articles.Count;
+
+            return this.articles.Skip(pageIndex * pageSize).Take(pageIndex).ToList();
+        }
+
+        public dynamic PreProcessMetadata(string contents, out string body)
         {
             var match = this.markdownHeaderRegex.Match(contents);
 
-            var matched = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var matched = new JsonObject();
             int length = 0;
             while (match.Success)
             {
@@ -50,6 +79,7 @@
             }
 
             body = contents.Substring(length);
+            matched["raw"] = body;
             body = this.TransformContent(body);
             return matched;
         }
@@ -63,6 +93,21 @@
         {
             string value;
             return dictionary.TryGetValue(key, out value) ? value : null;
+        }
+
+        protected string CombinePath(params string[] paths)
+        {
+            return System.IO.Path.Combine(paths);
+        }
+
+        protected string ReadFile(string path)
+        {
+            return File.ReadAllText(path);
+        }
+
+        protected string[] GetFiles(string path, string searchPattern)
+        {
+            return Directory.GetFiles(path, searchPattern);
         }
     }
 }
