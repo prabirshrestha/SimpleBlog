@@ -6,6 +6,7 @@ namespace SimpleBlogDemo.App_Start
     using System.Web.Hosting;
     using System.Web.Routing;
     using SimpleBlog;
+    using SimpleBlogDemo.SimpleOwin.Hosts;
 
     public class SimpleBlogDemoAppStart
     {
