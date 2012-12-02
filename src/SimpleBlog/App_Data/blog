@@ -2,3 +2,4 @@ title: Simple Blog
 tagLine: powered by Nancy
 description: Simple Blog Engine powered by Nancy
 articleCountPerPage: 5
+disqus_shortname: 

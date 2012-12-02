@@ -1,7 +1,8 @@
 ﻿@{
     Layout = "_layout.cshtml";
+    var articles = ViewBag.articles.Value;
 }
-@foreach (var article in Model.articles)
+@foreach (var article in articles)
 {
     @Html.Partial("_article.cshtml", article)
 }

@@ -1,5 +1,6 @@
 ﻿@{
     Layout = "_layout.cshtml";
+    var article = ViewBag.article.Value;
 }
 
-@Html.Partial("_article.cshtml", Model.article)
+@Html.Partial("_article.cshtml", article)

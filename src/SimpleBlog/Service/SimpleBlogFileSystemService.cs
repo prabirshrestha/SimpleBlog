@@ -115,6 +115,11 @@
 
         public dynamic GetArticles(int pageIndex, int pageSize, out long totalCount)
         {
+            if (pageIndex <= 0)
+            {
+                pageIndex = 1;
+            }
+
             if (pageSize <= 0)
             {
                 pageSize = 5;

@@ -11,18 +11,18 @@
             Get["/"] = _ => {
                 var blog = blogService.GetBlog();
 
-                long totalArticles;
-
-                dynamic model = new JsonObject(StringComparer.InvariantCultureIgnoreCase);
-                model.blog = blog;
-                model.articles = blogService.GetArticles(1, Convert.ToInt32(blog.articleCountPerPage), out totalArticles);
-                model.totalArticlesCount = totalArticles;
-
                 int pageIndex = 0;
-                var __ = Request.Query.page.HasValue && int.TryParse(Request.Query.page, out pageIndex);
-                model.page = pageIndex;
+                var y = Request.Query.page.HasValue && int.TryParse(Request.Query.page, out pageIndex);
 
-                return View["index", model];
+                long totalArticles;
+                var articles = blogService.GetArticles(pageIndex, Convert.ToInt32(blog.artcleCountPerPage), out totalArticles);
+
+                ViewBag.blog = blog;
+                ViewBag.articles = articles;
+                ViewBag.totalArticles = totalArticles;
+                ViewBag.singlePost = false;
+
+                return View["index"];
             };
         }
     }

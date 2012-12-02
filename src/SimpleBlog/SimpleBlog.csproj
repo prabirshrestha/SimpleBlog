@@ -138,6 +138,9 @@
     <Content Include="Views\index.cshtml" />
     <Content Include="Views\_layout.cshtml" />
     <Content Include="assets\stylesheets\style.less" />
+    <Content Include="Views\_disqusScript.cshtml">
+      <SubType>Code</SubType>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

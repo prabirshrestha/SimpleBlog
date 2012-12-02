@@ -1,6 +1,5 @@
 ﻿namespace SimpleBlog.Modules
 {
-    using System;
     using Nancy;
     using SimpleBlog.Service;
 
@@ -10,15 +9,15 @@
         {
             Get["/{slug}"] = x => {
                 var blog = blogService.GetBlog();
+                var article = blogService.GetArticleBySlug(x.slug);
 
-                dynamic model = new JsonObject(StringComparer.InvariantCultureIgnoreCase);
-                model.blog = blog;
-                model.article = blogService.GetArticleBySlug(x.slug);
+                if (article == null) return 404;
 
-                if (model.article == null)
-                    return 404;
+                ViewBag.blog = blog;
+                ViewBag.article = article;
+                ViewBag.singlePost = true;
 
-                return View["article", model];
+                return View["article"];
             };
 
             Get["/{article}/{file}"] =
