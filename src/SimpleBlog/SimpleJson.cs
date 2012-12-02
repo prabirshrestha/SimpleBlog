@@ -17,7 +17,7 @@
 // <website>https://github.com/facebook-csharp-sdk/simple-json</website>
 //-----------------------------------------------------------------------
 
-// VERSION: 0.20.1-alpha
+// VERSION: 0.24.0
 
 // NOTE: uncomment the following line to make SimpleJson class internal.
 //#define SIMPLE_JSON_INTERNAL
@@ -119,7 +119,24 @@ namespace SimpleBlog
         /// <summary>
         /// The internal member dictionary.
         /// </summary>
-        private readonly Dictionary<string, object> _members = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _members;
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonObject"/>.
+        /// </summary>
+        public JsonObject()
+        {
+            _members = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="JsonObject"/>.
+        /// </summary>
+        /// <param name="comparer">The <see cref="T:System.Collections.Generic.IEqualityComparer`1"/> implementation to use when comparing keys, or null to use the default <see cref="T:System.Collections.Generic.EqualityComparer`1"/> for the type of the key.</param>
+        public JsonObject(IEqualityComparer<string> comparer)
+        {
+            _members = new Dictionary<string, object>(comparer);
+        }
 
         /// <summary>
         /// Gets the <see cref="System.Object"/> at the specified index.
