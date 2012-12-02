@@ -120,6 +120,8 @@
     <Compile Include="Service\ISimpleBlogService.cs" />
     <Compile Include="Service\SimpleBlogFileSystemService.cs" />
     <Compile Include="SimpleJson.cs" />
+    <Content Include="Views\article.cshtml" />
+    <None Include="Views\_article.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\**\dummycsprojwildcardhack" />

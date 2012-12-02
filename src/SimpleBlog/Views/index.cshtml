@@ -1,7 +1,7 @@
 ﻿@{
     Layout = "_layout.cshtml";
 }
-@foreach (var article in Model.articles) {
-    <h2>@article.title</h2>
-    @Html.Raw(article.content)
+@foreach (var article in Model.articles)
+{
+    @Html.Partial("_article.cshtml", article)
 }

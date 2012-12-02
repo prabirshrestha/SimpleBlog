@@ -1,6 +1,8 @@
 ﻿namespace SimpleBlog.Service
 {
+    using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Text.RegularExpressions;
     using MarkdownDeep;
@@ -13,7 +15,7 @@
         private readonly Regex markdownHeaderRegex = new Regex(@"^(\w+):\s*(.*)\s*\n", RegexOptions.Compiled | RegexOptions.Multiline);
         private readonly Markdown markdown = new Markdown();
 
-        private readonly dynamic blog;
+        private dynamic blog;
         private IList<dynamic> articles;
 
         public SimpleBlogFileSystemService(IRootPathProvider rootPathProvider)
@@ -25,10 +27,7 @@
         {
             this.rootPath = path;
 
-            string body;
-            this.blog = this.PreProcessMetadata(ReadFile(CombinePath(this.rootPath, "blog")), out body);
-
-            this.articles = this.GetArticles();
+            this.ReloadMetadata();
         }
 
         private dynamic GetArticles()
@@ -41,11 +40,66 @@
             {
                 string content;
                 var metadata = PreProcessMetadata(ReadFile(file), out content);
+                if (!metadata.ContainsKey("title"))
+                {
+                    throw new ApplicationException("Article does not contain Title - " + file);
+                }
+
+                if (!metadata.ContainsKey("date"))
+                {
+                    throw new ApplicationException("Article does not contain Title - " + file);
+                }
+
+                string dt = metadata.date;
+                if (dt.Contains("("))
+                {
+                    dt = dt.Substring(0, dt.LastIndexOf(" ", StringComparison.Ordinal));
+                }
+
+                DateTime dateTime;
+                if (!DateTime.TryParseExact(dt, "ddd MMM dd yyyy HH:mm:ss 'GMT'zzz", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dateTime))
+                {
+                    throw new ApplicationException("Unrecognized date time format " + (string)metadata.date + " in " + GetFileNameWithoutExtnsion(file) + ". Expected format: ddd MMM dd yyyy HH:mm:ss 'GMT'zzz. Sample:  Tue Feb 02 2010 10:16:51 GMT-0600 (CST)");
+                }
+
+                metadata["DateTime"] = dateTime;
                 metadata["content"] = content;
+
+                if (!metadata.ContainsKey("slug"))
+                {
+                    metadata.slug = GenerateSlug(metadata.title);
+                }
+
                 articles.Add(metadata);
             }
 
+            // sort descending
+            articles.Sort(new Comparison<dynamic>((x, y) => {
+                DateTime xDateTime = x.DateTime;
+                DateTime yDateTime = y.DateTime;
+
+                return yDateTime.CompareTo(xDateTime);
+            }));
+
             return articles;
+        }
+
+        public static string GenerateSlug(string phrase)
+        {
+            string str = RemoveAccent(phrase).ToLower();
+
+            str = Regex.Replace(str, @"[^a-z0-9\s-]", ""); // invalid chars           
+            str = Regex.Replace(str, @"\s+", " ").Trim(); // convert multiple spaces into one space   
+            str = str.Substring(0, str.Length <= 45 ? str.Length : 45).Trim(); // cut and trim it   
+            str = Regex.Replace(str, @"\s", "-"); // hyphens   
+
+            return str;
+        }
+
+        private static string RemoveAccent(string txt)
+        {
+            byte[] bytes = System.Text.Encoding.GetEncoding("Cyrillic").GetBytes(txt);
+            return System.Text.Encoding.ASCII.GetString(bytes);
         }
 
         public string Path
@@ -55,21 +109,27 @@
 
         public dynamic GetBlog()
         {
+            this.ReloadMetadata();
             return blog;
         }
 
         public dynamic GetArticles(int pageIndex, int pageSize, out long totalCount)
         {
+            if (pageSize <= 0)
+            {
+                pageSize = 5;
+            }
+
             totalCount = this.articles.Count;
 
-            return this.articles.Skip(pageIndex * pageSize).Take(pageIndex).ToList();
+            return this.articles.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
         }
 
         public dynamic PreProcessMetadata(string contents, out string body)
         {
             var match = this.markdownHeaderRegex.Match(contents);
 
-            var matched = new JsonObject();
+            var matched = new JsonObject(StringComparer.InvariantCultureIgnoreCase);
             int length = 0;
             while (match.Success)
             {
@@ -87,6 +147,11 @@
         public virtual string TransformContent(string input)
         {
             return this.markdown.Transform(input);
+        }
+
+        public dynamic GetArticleBySlug(string slug)
+        {
+            return this.articles.SingleOrDefault(a => a.slug == slug);
         }
 
         public static string GetStringValue(IDictionary<string, string> dictionary, string key)
@@ -108,6 +173,18 @@
         protected string[] GetFiles(string path, string searchPattern)
         {
             return Directory.GetFiles(path, searchPattern);
+        }
+
+        protected string GetFileNameWithoutExtnsion(string file)
+        {
+            return System.IO.Path.GetFileNameWithoutExtension(file);
+        }
+
+        protected void ReloadMetadata()
+        {
+            string body;
+            this.blog = this.PreProcessMetadata(ReadFile(CombinePath(this.rootPath, "blog")), out body);
+            this.articles = this.GetArticles();
         }
     }
 }

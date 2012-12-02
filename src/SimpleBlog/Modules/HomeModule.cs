@@ -8,20 +8,22 @@
     {
         public HomeModule(ISimpleBlogService blogService)
         {
-            Get["/"] =
-                _ =>
-                {
-                    var blog = blogService.GetBlog();
+            Get["/"] = _ => {
+                var blog = blogService.GetBlog();
 
-                    long totalArticles;
+                long totalArticles;
 
-                    dynamic model = new JsonObject();
-                    model.blog = blog;
-                    model.articles = blogService.GetArticles(1, Convert.ToInt32(blog.articleCountPerPage),out totalArticles);
-                    model.totalArticlesCount = totalArticles;
+                dynamic model = new JsonObject(StringComparer.InvariantCultureIgnoreCase);
+                model.blog = blog;
+                model.articles = blogService.GetArticles(1, Convert.ToInt32(blog.articleCountPerPage), out totalArticles);
+                model.totalArticlesCount = totalArticles;
 
-                    return View["index", model];
-                };
+                int pageIndex = 0;
+                var __ = Request.Query.page.HasValue && int.TryParse(Request.Query.page, out pageIndex);
+                model.page = pageIndex;
+
+                return View["index", model];
+            };
         }
     }
 }
