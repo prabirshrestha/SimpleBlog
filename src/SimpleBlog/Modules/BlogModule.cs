@@ -14,8 +14,10 @@
                 int pageIndex;
                 int.TryParse(Request.Query.page, out pageIndex);
 
+                bool isAdmin = Context.CurrentUser != null;
+
                 var blog = blogService.GetBlog();
-                var articlesPaged = blogService.GetArticles(pageIndex, blog.PageSize, includeHidden: Context.CurrentUser != null);
+                var articlesPaged = blogService.GetArticles(pageIndex, blog.PageSize, includeHidden: isAdmin);
 
                 var viewModel = new ArticlesViewModel {
                     Blog = blog,
@@ -24,6 +26,7 @@
                 };
 
                 ViewBag.SinglePost = false;
+                ViewBag.IsAdmin = isAdmin;
                 ViewBag.Blog = blog;
 
                 return Negotiate
