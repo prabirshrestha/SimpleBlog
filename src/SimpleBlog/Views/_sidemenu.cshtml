@@ -1,0 +1,12 @@
+﻿@{
+    var blog = ViewBag.Blog.Value;
+}
+<ul>
+    @if (!string.IsNullOrWhiteSpace(blog.Metadata.Twitter)) {
+        <li><a href="https://twitter.com/@blog.Metadata.Twitter">@@@blog.Metadata.Twitter</a></li>
+    }
+    @if (!string.IsNullOrWhiteSpace(blog.Metadata.Github)) {
+        <li><a href="https://github.com/@blog.Metadata.Github">github</a></li>
+    }
+    <li><a href="@Url.Content("~/rss")">rss feed</a></li>
+</ul>

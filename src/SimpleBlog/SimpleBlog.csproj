@@ -148,6 +148,7 @@
     <Content Include="packages.config" />
     <Content Include="assets\stylesheets\style.less" />
     <Content Include="Views\_layout.cshtml" />
+    <Content Include="Views\_sidemenu.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

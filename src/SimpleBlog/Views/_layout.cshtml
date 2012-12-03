@@ -22,7 +22,7 @@
         <header>
             <h1><a href="@Url.Content("~/")">@blog.Title</a></h1>
             <span>@blog.TagLine</span>
-            <ul></ul>
+            @Html.Partial("_sidemenu")
             <span class="powered-by">
                 Powered by <a href="http://github.com/prabirshrestha/SimpleBlog.git">Simple Blog</a> and <a href="http://nancyfx.org">Nancy</a>
             </span>
