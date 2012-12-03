@@ -64,6 +64,10 @@
                     .WithMediaRangeModel("application/json", article)
                     .WithMediaRangeModel("text/html", article).WithView("articles/article");
             };
+
+            Get["/{slug}/{file}"] = x => {
+                return "requested file " + x.file + " for article " + x.slug;
+            };
         }
     }
 }
