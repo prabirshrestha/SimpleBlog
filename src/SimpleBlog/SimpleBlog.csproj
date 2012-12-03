@@ -112,6 +112,7 @@
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="CassetteConfiguration.cs" />
+    <Content Include="Views\_googleAnalyticsScript.cshtml" />
     <None Include="Views\_disqusScript.cshtml" />
     <None Include="Views\articles\article.cshtml" />
     <None Include="Views\articles\_article.cshtml" />

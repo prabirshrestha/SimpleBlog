@@ -12,7 +12,7 @@
 
     public class SimpleBlogFileSystemService : ISimpleBlogService
     {
-        private readonly Regex markdownHeaderRegex = new Regex(@"^(\w+):\s*(.*)\s*\n", RegexOptions.Compiled | RegexOptions.Multiline);
+        private readonly Regex markdownHeaderRegex = new Regex(@"(.*):(.*)\n", RegexOptions.Compiled | RegexOptions.Multiline);
         private readonly Markdown markdown = new Markdown();
 
         public SimpleBlogFileSystemService(IRootPathProvider rootPathProvider)

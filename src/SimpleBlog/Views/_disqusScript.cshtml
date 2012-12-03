@@ -3,7 +3,7 @@
 }
 @if (ViewBag.SinglePost && !string.IsNullOrWhiteSpace(blog.Metadata.DisqusShortName))
 {
-    <script type="text/javascript">
+    <script>
         var disqus_shortname = '@blog.Metadata.DisqusShortName';
         (function () {
             var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
