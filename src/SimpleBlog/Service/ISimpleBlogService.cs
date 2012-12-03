@@ -1,11 +1,15 @@
 ﻿namespace SimpleBlog.Service
 {
+    using System;
+    using System.Collections.Generic;
+    using SimpleBlog.Models;
+
     public interface ISimpleBlogService
     {
-        dynamic GetBlog();
-        dynamic GetArticles(int pageIndex, int pageSize, out long totalCount);
+        string DataPath { get; }
+        DateTime CurrentTime { get; }
 
-        string TransformContent(string input);
-        dynamic GetArticleBySlug(string slug);
+        Blog GetBlog();
+        Tuple<long, IEnumerable<Article>> GetArticles(int pageIndex, int pageSize, bool includeHidden);
     }
 }

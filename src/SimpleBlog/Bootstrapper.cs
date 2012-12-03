@@ -1,18 +1,15 @@
 ﻿namespace SimpleBlog
 {
-    using System.IO;
     using Nancy;
-    using SimpleBlog.Service;
+    using Nancy.Conventions;
 
     public class Bootstrapper : DefaultNancyBootstrapper
     {
-        protected override void ApplicationStartup(Nancy.TinyIoc.TinyIoCContainer container, Nancy.Bootstrapper.IPipelines pipelines)
+        protected override void ConfigureConventions(NancyConventions nancyConventions)
         {
-            base.ApplicationStartup(container, pipelines);
-
-            var rootPath = container.Resolve<IRootPathProvider>().GetRootPath();
-            var blogService = new SimpleBlogFileSystemService(Path.Combine(rootPath, "App_Data"));
-            container.Register<ISimpleBlogService>(blogService);
+            base.ConfigureConventions(nancyConventions);
+            nancyConventions.StaticContentsConventions.Clear();
+            nancyConventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("/", "public"));
         }
     }
 }

@@ -4,38 +4,73 @@
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Text.RegularExpressions;
     using MarkdownDeep;
     using Nancy;
-    using System.Linq;
+    using SimpleBlog.Models;
 
     public class SimpleBlogFileSystemService : ISimpleBlogService
     {
-        private readonly string rootPath;
         private readonly Regex markdownHeaderRegex = new Regex(@"^(\w+):\s*(.*)\s*\n", RegexOptions.Compiled | RegexOptions.Multiline);
         private readonly Markdown markdown = new Markdown();
 
-        private dynamic blog;
-        private IList<dynamic> articles;
-
         public SimpleBlogFileSystemService(IRootPathProvider rootPathProvider)
-            : this(System.IO.Path.Combine(rootPathProvider.GetRootPath(), "App_Data"))
+            : this(Path.Combine(rootPathProvider.GetRootPath(), "App_Data"))
         {
         }
 
-        public SimpleBlogFileSystemService(string path)
+        public SimpleBlogFileSystemService(string dataPath)
         {
-            this.rootPath = path;
-
-            this.ReloadMetadata();
+            this.DataPath = dataPath;
         }
 
-        private dynamic GetArticles()
+        public string DataPath { get; private set; }
+
+        public DateTime CurrentTime { get { return DateTime.UtcNow; } }
+
+        public Blog GetBlog()
         {
-            var articlesFolder = CombinePath(this.rootPath, "articles");
+            string body;
+            var blog = new Blog {
+                Metadata = this.PreProcessMetadata(ReadFile(CombinePath(DataPath, "blog")), out body),
+            };
+            return blog;
+        }
+
+        public Tuple<long, IEnumerable<Article>> GetArticles(int pageIndex, int pageSize, bool includeHidden)
+        {
+            if (pageIndex <= 0)
+            {
+                pageIndex = 1;
+            }
+
+            if (pageSize <= 0)
+            {
+                pageSize = 5;
+            }
+
+            var currentTime = CurrentTime;
+
+            var articles = GetAllArticles();
+            if (!includeHidden)
+            {
+                articles = articles.Where(article => article.IsHidden(currentTime));
+            }
+
+            var total = articles.LongCount();
+
+            articles = articles.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+
+            return new Tuple<long, IEnumerable<Article>>(total, articles);
+        }
+
+        private IEnumerable<Article> GetAllArticles()
+        {
+            var articlesFolder = CombinePath(DataPath, "articles");
             var files = Directory.GetFiles(articlesFolder, "*.markdown");
 
-            var articles = new JsonArray();
+            var articles = new List<Article>();
             foreach (var file in files)
             {
                 string content;
@@ -59,7 +94,7 @@
                 DateTime dateTime;
                 if (!DateTime.TryParseExact(dt, "ddd MMM dd yyyy HH:mm:ss 'GMT'zzz", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dateTime))
                 {
-                    throw new ApplicationException("Unrecognized date time format " + (string)metadata.date + " in " + GetFileNameWithoutExtnsion(file) + ". Expected format: ddd MMM dd yyyy HH:mm:ss 'GMT'zzz. Sample:  Tue Feb 02 2010 10:16:51 GMT-0600 (CST)");
+                    throw new ApplicationException("Unrecognized date time format " + (string)metadata.date + " in " + GetFileNameWithoutExtension(file) + ". Expected format: ddd MMM dd yyyy HH:mm:ss 'GMT'zzz. Sample:  Tue Feb 02 2010 10:16:51 GMT-0600 (CST)");
                 }
 
                 metadata["DateTime"] = dateTime;
@@ -67,10 +102,14 @@
 
                 if (!metadata.ContainsKey("slug"))
                 {
-                    metadata.slug = GenerateSlug(metadata.title);
+                    //metadata.slug = GenerateSlug(metadata.title);
                 }
 
-                articles.Add(metadata);
+                var article = new Article {
+                    Metadata = metadata
+                };
+
+                articles.Add(article);
             }
 
             // sort descending
@@ -84,69 +123,23 @@
             return articles;
         }
 
-        public static string GenerateSlug(string phrase)
-        {
-            string str = RemoveAccent(phrase).ToLower();
-
-            str = Regex.Replace(str, @"[^a-z0-9\s-]", ""); // invalid chars           
-            str = Regex.Replace(str, @"\s+", " ").Trim(); // convert multiple spaces into one space   
-            str = str.Substring(0, str.Length <= 45 ? str.Length : 45).Trim(); // cut and trim it   
-            str = Regex.Replace(str, @"\s", "-"); // hyphens   
-
-            return str;
-        }
-
-        private static string RemoveAccent(string txt)
-        {
-            byte[] bytes = System.Text.Encoding.GetEncoding("Cyrillic").GetBytes(txt);
-            return System.Text.Encoding.ASCII.GetString(bytes);
-        }
-
-        public string Path
-        {
-            get { return this.rootPath; }
-        }
-
-        public dynamic GetBlog()
-        {
-            this.ReloadMetadata();
-            return blog;
-        }
-
-        public dynamic GetArticles(int pageIndex, int pageSize, out long totalCount)
-        {
-            if (pageIndex <= 0)
-            {
-                pageIndex = 1;
-            }
-
-            if (pageSize <= 0)
-            {
-                pageSize = 5;
-            }
-
-            totalCount = this.articles.Count;
-
-            return this.articles.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
-        }
-
-        public dynamic PreProcessMetadata(string contents, out string body)
+        public virtual dynamic PreProcessMetadata(string contents, out string body)
         {
             var match = this.markdownHeaderRegex.Match(contents);
 
-            var matched = new JsonObject(StringComparer.InvariantCultureIgnoreCase);
+            var dict = new DynamicDictionary();
             int length = 0;
             while (match.Success)
             {
-                matched[match.Groups[1].Value] = match.Groups[2].Value;
+                dict[match.Groups[1].Value] = match.Groups[2].Value;
                 length += match.Length;
                 match = match.NextMatch();
             }
 
             body = contents.Substring(length);
-            matched["raw"] = body;
+            dict["raw"] = body;
             body = this.TransformContent(body);
-            return matched;
+            return dict;
         }
 
         public virtual string TransformContent(string input)
@@ -154,20 +147,9 @@
             return this.markdown.Transform(input);
         }
 
-        public dynamic GetArticleBySlug(string slug)
-        {
-            return this.articles.SingleOrDefault(a => a.slug == slug);
-        }
-
-        public static string GetStringValue(IDictionary<string, string> dictionary, string key)
-        {
-            string value;
-            return dictionary.TryGetValue(key, out value) ? value : null;
-        }
-
         protected string CombinePath(params string[] paths)
         {
-            return System.IO.Path.Combine(paths);
+            return Path.Combine(paths);
         }
 
         protected string ReadFile(string path)
@@ -180,16 +162,9 @@
             return Directory.GetFiles(path, searchPattern);
         }
 
-        protected string GetFileNameWithoutExtnsion(string file)
+        protected string GetFileNameWithoutExtension(string file)
         {
-            return System.IO.Path.GetFileNameWithoutExtension(file);
-        }
-
-        protected void ReloadMetadata()
-        {
-            string body;
-            this.blog = this.PreProcessMetadata(ReadFile(CombinePath(this.rootPath, "blog")), out body);
-            this.articles = this.GetArticles();
+            return Path.GetFileNameWithoutExtension(file);
         }
     }
 }

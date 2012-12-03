@@ -1,5 +1,9 @@
-title: Simple Blog
-tagLine: powered by Nancy
-description: Simple Blog Engine powered by Nancy
-articleCountPerPage: 5
-disqus_shortname: 
+Title: Simple Blog
+TagLine: powered by Simple Blog and Nancy
+Login: username
+Password: password
+PageSize: 5
+Name: Your name
+Twitter: 
+Github: 
+GoogleAnalyticsId: 
