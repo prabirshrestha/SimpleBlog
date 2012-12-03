@@ -21,7 +21,7 @@
         {
             get
             {
-                if (!Metadata.Draft.HasValue) return true;
+                if (!Metadata.Draft.HasValue) return false;
                 return Metadata.Draft;
             }
             set { Metadata.Draft = value; }
@@ -31,7 +31,7 @@
         {
             get
             {
-                string dt = Metadata.Date ?? string.Empty;
+                string dt = Metadata.Date.Value ?? string.Empty;
                 if (dt.Contains("("))
                 {
                     dt = dt.Substring(0, dt.LastIndexOf(" ", StringComparison.Ordinal));

@@ -35,6 +35,7 @@
             var blog = new Blog {
                 Metadata = this.PreProcessMetadata(ReadFile(CombinePath(DataPath, "blog")), out body),
             };
+            blog.Metadata.Remove("RawContent");
             return blog;
         }
 
@@ -148,7 +149,7 @@
             }
 
             body = contents.Substring(length);
-            dict["raw"] = body;
+            dict["RawContent"] = body;
             body = this.TransformContent(body);
             return dict;
         }

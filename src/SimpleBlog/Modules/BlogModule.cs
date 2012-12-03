@@ -1,6 +1,7 @@
 ﻿namespace SimpleBlog.Modules
 {
     using Nancy;
+    using Nancy.Extensions;
     using SimpleBlog.Models;
     using SimpleBlog.Service;
 
@@ -28,11 +29,26 @@
 
                 ViewBag.SinglePost = false;
 
-                return Negotiate
+                var negotiater = Negotiate
                     .WithMediaRangeModel("application/javascript", viewModel).WithView("articles/rss/jsonp/index")
-                    .WithMediaRangeModel("application/json", viewModel).WithView("articles/rss/json/index")
-                    .WithMediaRangeModel("application/xml", viewModel).WithView("articles/rss/xml/index")
-                    .WithMediaRangeModel("text/html", viewModel).WithView("articles/articles");
+                    .WithMediaRangeModel("application/json", viewModel).WithView("articles/rss/json/index");
+
+                if (Request.Path == Context.ToFullPath("~/rss"))
+                {
+                    // if /rss make xml the default
+                    negotiater = negotiater
+                        .WithMediaRangeModel("text/html", viewModel).WithView("articles/articles")
+                        .WithMediaRangeModel("application/xml", viewModel).WithView("articles/rss/xml/index");
+                }
+                else
+                {
+                    // else make html the default
+                    negotiater = negotiater
+                        .WithMediaRangeModel("application/xml", viewModel).WithView("articles/rss/xml/index")
+                        .WithMediaRangeModel("text/html", viewModel).WithView("articles/articles");
+                }
+
+                return negotiater;
             };
 
             Get["/{slug}"] = x => {
@@ -43,6 +59,9 @@
                 ViewBag.SinglePost = true;
 
                 return Negotiate
+                    .WithMediaRangeModel("application/xml", article)
+                    .WithMediaRangeModel("application/javascript", article)
+                    .WithMediaRangeModel("application/json", article)
                     .WithMediaRangeModel("text/html", article).WithView("articles/article");
             };
         }
