@@ -4,6 +4,7 @@ Login: username
 Password: password
 PageSize: 5
 Name: Your name
+DisqusShortName: 
 Twitter: 
 Github: 
 GoogleAnalyticsId: 

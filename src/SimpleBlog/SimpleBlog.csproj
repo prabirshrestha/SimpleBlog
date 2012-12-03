@@ -112,6 +112,7 @@
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="CassetteConfiguration.cs" />
+    <None Include="Views\_disqusScript.cshtml" />
     <None Include="Views\articles\article.cshtml" />
     <None Include="Views\articles\_article.cshtml" />
     <None Include="Modules\ArticleModule.cs" />

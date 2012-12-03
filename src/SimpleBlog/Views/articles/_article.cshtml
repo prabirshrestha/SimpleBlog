@@ -4,7 +4,7 @@
 <section>
     <h2><a href="@Url.Content("~/" + Model.Slug)">@Model.Title</a></h2>
     @Html.Raw(Model.HtmlContent)
-    @if (ViewBag.SinglePost && !string.IsNullOrWhiteSpace(blog.Metadata.disqus_shortname))
+    @if (ViewBag.SinglePost && !string.IsNullOrWhiteSpace(blog.Metadata.DisqusShortName))
     {
         <div id="disqus_thread"></div>
     }
