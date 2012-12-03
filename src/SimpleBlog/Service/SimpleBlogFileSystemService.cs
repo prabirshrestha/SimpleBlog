@@ -65,6 +65,21 @@
             return new Tuple<long, IEnumerable<Article>>(total, articles);
         }
 
+        public Article GetArticleBySlug(string slug, bool includeHidden)
+        {
+            var article = GetAllArticles().SingleOrDefault(a => a.Slug == slug);
+            if (article == null)
+                return null;
+
+            if (includeHidden)
+            {
+                if (article.IsHidden(CurrentTime))
+                    return null;
+            }
+
+            return article;
+        }
+
         public string GenerateSlug(string input)
         {
             string str = RemoveAccent(input).ToLower();

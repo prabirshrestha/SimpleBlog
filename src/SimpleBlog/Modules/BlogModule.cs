@@ -1,6 +1,5 @@
 ﻿namespace SimpleBlog.Modules
 {
-    using System.Linq;
     using Nancy;
     using SimpleBlog.Models;
     using SimpleBlog.Service;
@@ -9,31 +8,42 @@
     {
         public BlogModule(ISimpleBlogService blogService)
         {
-            Get["/{rss?}"] = x => {
+            Before += ctx => {
+                ViewBag.IsAdmin = Context.CurrentUser != null;
+                ViewBag.Blog = blogService.GetBlog();
+                return null;
+            };
 
+            Get["/(rss)?"] = x => {
                 int pageIndex;
                 int.TryParse(Request.Query.page, out pageIndex);
 
-                bool isAdmin = Context.CurrentUser != null;
-
-                var blog = blogService.GetBlog();
-                var articlesPaged = blogService.GetArticles(pageIndex, blog.PageSize, includeHidden: isAdmin);
-
                 var viewModel = new ArticlesViewModel {
-                    Blog = blog,
-                    TotalArticles = articlesPaged.Item1,
-                    Articles = articlesPaged.Item2,
+                    Blog = ViewBag.Blog.Value
                 };
 
+                var articlesPaged = blogService.GetArticles(pageIndex, viewModel.Blog.PageSize, includeHidden: (bool)ViewBag.IsAdmin);
+                viewModel.TotalArticles = articlesPaged.Item1;
+                viewModel.Articles = articlesPaged.Item2;
+
                 ViewBag.SinglePost = false;
-                ViewBag.IsAdmin = isAdmin;
-                ViewBag.Blog = blog;
 
                 return Negotiate
                     .WithMediaRangeModel("application/javascript", viewModel).WithView("articles/rss/jsonp/index")
                     .WithMediaRangeModel("application/json", viewModel).WithView("articles/rss/json/index")
                     .WithMediaRangeModel("application/xml", viewModel).WithView("articles/rss/xml/index")
                     .WithMediaRangeModel("text/html", viewModel).WithView("articles/articles");
+            };
+
+            Get["/{slug}"] = x => {
+                Article article = blogService.GetArticleBySlug(x.slug, includeHidden: ViewBag.IsAdmin);
+
+                if (article == null) return 404;
+
+                ViewBag.SinglePost = true;
+
+                return Negotiate
+                    .WithMediaRangeModel("text/html", article).WithView("articles/article");
             };
         }
     }
