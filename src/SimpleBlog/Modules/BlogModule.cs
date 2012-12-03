@@ -1,5 +1,6 @@
 ﻿namespace SimpleBlog.Modules
 {
+    using System.Linq;
     using Nancy;
     using SimpleBlog.Models;
     using SimpleBlog.Service;
@@ -21,6 +22,9 @@
                     TotalArticles = articlesPaged.Item1,
                     Articles = articlesPaged.Item2,
                 };
+
+                ViewBag.SinglePost = false;
+                ViewBag.Blog = blog;
 
                 return Negotiate
                     .WithMediaRangeModel("application/javascript", viewModel).WithView("articles/rss/jsonp/index")

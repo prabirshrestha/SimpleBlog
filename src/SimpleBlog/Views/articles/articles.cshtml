@@ -1,4 +1,8 @@
 ﻿@{
-    Layout = "_layout";
+    Layout = "_layout.cshtml";
 }
-article
+
+@foreach (var article in Model.Articles)
+{
+    @Html.Partial("articles/_article", article)
+}

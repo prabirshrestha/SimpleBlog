@@ -1,0 +1,11 @@
+﻿@{
+    var blog = ViewBag.Blog.Value;
+}
+<section>
+    <h2><a href="@Url.Content("~/")">@Model.Title</a></h2>
+    @Html.Raw(Model.HtmlContent)
+    @if (ViewBag.SinglePost && !string.IsNullOrWhiteSpace(blog.Metadata.disqus_shortname))
+    {
+        <div id="disqus_thread"></div>
+    }
+</section>

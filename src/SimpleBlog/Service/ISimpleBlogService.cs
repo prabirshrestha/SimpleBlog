@@ -11,5 +11,7 @@
 
         Blog GetBlog();
         Tuple<long, IEnumerable<Article>> GetArticles(int pageIndex, int pageSize, bool includeHidden);
+
+        string GenerateSlug(string input);
     }
 }

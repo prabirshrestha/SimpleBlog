@@ -65,6 +65,24 @@
             return new Tuple<long, IEnumerable<Article>>(total, articles);
         }
 
+        public string GenerateSlug(string input)
+        {
+            string str = RemoveAccent(input).ToLower();
+
+            str = Regex.Replace(str, @"[^a-z0-9\s-]", ""); // invalid chars           
+            str = Regex.Replace(str, @"\s+", " ").Trim(); // convert multiple spaces into one space   
+            str = str.Substring(0, str.Length <= 45 ? str.Length : 45).Trim(); // cut and trim it   
+            str = Regex.Replace(str, @"\s", "-"); // hyphens   
+
+            return str;
+        }
+
+        private static string RemoveAccent(string txt)
+        {
+            byte[] bytes = System.Text.Encoding.GetEncoding("Cyrillic").GetBytes(txt);
+            return System.Text.Encoding.ASCII.GetString(bytes);
+        }
+
         private IEnumerable<Article> GetAllArticles()
         {
             var articlesFolder = CombinePath(DataPath, "articles");
@@ -75,39 +93,17 @@
             {
                 string content;
                 var metadata = PreProcessMetadata(ReadFile(file), out content);
-                if (!metadata.ContainsKey("title"))
-                {
-                    throw new ApplicationException("Article does not contain Title - " + file);
-                }
-
-                if (!metadata.ContainsKey("date"))
-                {
-                    throw new ApplicationException("Article does not contain Title - " + file);
-                }
-
-                string dt = metadata.date;
-                if (dt.Contains("("))
-                {
-                    dt = dt.Substring(0, dt.LastIndexOf(" ", StringComparison.Ordinal));
-                }
-
-                DateTime dateTime;
-                if (!DateTime.TryParseExact(dt, "ddd MMM dd yyyy HH:mm:ss 'GMT'zzz", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dateTime))
-                {
-                    throw new ApplicationException("Unrecognized date time format " + (string)metadata.date + " in " + GetFileNameWithoutExtension(file) + ". Expected format: ddd MMM dd yyyy HH:mm:ss 'GMT'zzz. Sample:  Tue Feb 02 2010 10:16:51 GMT-0600 (CST)");
-                }
-
-                metadata["DateTime"] = dateTime;
-                metadata["content"] = content;
-
-                if (!metadata.ContainsKey("slug"))
-                {
-                    //metadata.slug = GenerateSlug(metadata.title);
-                }
 
                 var article = new Article {
-                    Metadata = metadata
+                    Metadata = metadata,
+                    RawContent = content,
+                    HtmlContent = TransformContent(content)
                 };
+
+                if (!metadata.ContainsKey("Slug"))
+                {
+                    article.Slug = GenerateSlug(metadata.Title);
+                }
 
                 articles.Add(article);
             }

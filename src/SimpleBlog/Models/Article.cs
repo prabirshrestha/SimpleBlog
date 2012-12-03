@@ -19,7 +19,11 @@
 
         public bool Draft
         {
-            get { return Metadata.Draft; }
+            get
+            {
+                if (!Metadata.Draft.HasValue) return true;
+                return Metadata.Draft;
+            }
             set { Metadata.Draft = value; }
         }
 
@@ -27,27 +31,35 @@
         {
             get
             {
+                string dt = Metadata.Date ?? string.Empty;
+                if (dt.Contains("("))
+                {
+                    dt = dt.Substring(0, dt.LastIndexOf(" ", StringComparison.Ordinal));
+                }
+
                 DateTime dateTime;
-                if (!DateTime.TryParseExact(Metadata.Date, DateFormats, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dateTime))
+                if (!DateTime.TryParseExact(dt, DateFormats, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dateTime))
                 {
                     return DateTime.MaxValue;
                 }
+
                 return dateTime;
             }
             set { Metadata.Date = value.ToString(DateFormats[0]); }
         }
 
+        public string Slug
+        {
+            get { return Metadata.Slug; }
+            set { Metadata.Slug = value; }
+        }
+
+        public string RawContent { get; set; }
+        public string HtmlContent { get; set; }
+
         public bool IsHidden(DateTime currentTime)
         {
             return Draft || Date >= currentTime;
         }
-
-        public string RawContent
-        {
-            get { return Metadata.RawContent; }
-            set { Metadata.RawContent = value; }
-        }
-
-        public string HtmlContent { get; set; }
     }
 }
