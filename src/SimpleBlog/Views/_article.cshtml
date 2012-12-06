@@ -14,14 +14,18 @@
             <h1><a href="@Model.slug">@Model.title</a></h1>
         }
         <div>@Html.Raw(Model.html)</div>
+        <div>
+            @if (singleArticle) {
+                <a class="button space-top space-bottom" href="../">Back to Blog</a>
+                 @if (isAdmin) {
+                    <ul class="actions">
+                        <li><a href="/@(Model.slug)/edit">Edit</a></li>
+                     </ul>
+                 }
+            }
+        </div>
     </div>
-    @if (singleArticle && Model.comments && !string.IsNullOrWhiteSpace(blog.disqusShortName))
-    {
-        <a class="button space-top space-down" href="../">Back to Blog</a>
-         @if (isAdmin)
-         {
-            <a href="#">edit</a>
-         }
+    @if (singleArticle && Model.comments && !string.IsNullOrWhiteSpace(blog.disqusShortName)) {
         <div id="disqus_thread"></div>
         <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     }
