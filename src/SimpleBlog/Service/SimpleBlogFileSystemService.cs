@@ -35,23 +35,29 @@
         {
             var metadata = this.PreProcessMetadata(ReadFile(CombinePath(DataPath, "config")));
             if (metadata.ContainsKey("raw")) metadata.Remove("raw");
-            if (!metadata.ContainsKey("pageSize")) metadata.pageSize = 5L;
+            if (!metadata.ContainsKey("pageSize")) metadata.pageSize = "5";
             return metadata;
         }
 
         public Tuple<dynamic, long> GetArticles(int pageIndex, int pageSize, bool includeHidden)
         {
-            var articles = GetAllArticles();
+            var currentTime = CurrentTime;
+            var articles = GetAllArticles().Where(a => a.date < currentTime);
+
+            if (!includeHidden)
+            {
+                articles = articles.Where(a => a.draft == false);
+            }
 
             foreach (var article in articles)
             {
                 article.html = TransformContent(article.raw);
             }
 
-            return new Tuple<dynamic, long>(articles, articles.Count);
+            return new Tuple<dynamic, long>(articles.Skip((pageIndex - 1) * pageSize).Take(pageSize), articles.LongCount());
         }
 
-        private IList<dynamic> GetAllArticles()
+        private IEnumerable<dynamic> GetAllArticles()
         {
             var articlesFolder = CombinePath(DataPath, "articles");
             var files = Directory.GetFiles(articlesFolder, "*.markdown");
@@ -64,12 +70,12 @@
 
                 if (!metadata.ContainsKey("title")) throw new ApplicationException("title required for " + GetFileNameWithoutExtension(file));
                 if (!metadata.ContainsKey("date")) throw new ApplicationException("date required for " + GetFileNameWithoutExtension(file));
+                metadata.date = ParseAsDateTime(metadata.date);
 
                 if (!metadata.ContainsKey("slug")) metadata.slug = GenerateSlug(metadata.title);
-                if (!metadata.ContainsKey("draft")) metadata.draft = false;
-                if (!metadata.ContainsKey("comments")) metadata.comments = true;
+                metadata.draft = metadata.ContainsKey("draft") ? bool.Parse(metadata.draft) : false;
+                metadata.comments = metadata.ContainsKey("comments") ? bool.Parse(metadata.comments) : true;
 
-                metadata.date = ParseAsDateTime(metadata.date);
                 articles.Add(metadata);
             }
 
