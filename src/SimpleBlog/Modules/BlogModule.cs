@@ -2,6 +2,7 @@
 {
     using System;
     using Nancy;
+    using Nancy.Responses;
     using SimpleBlog.Service;
 
     public class BlogModule : NancyModule
@@ -18,15 +19,21 @@
                 int pageIndex;
                 int.TryParse(Request.Query.page, out pageIndex);
 
-                if (pageIndex <= 0) pageIndex = 1;
+                if (pageIndex <= 1)
+                {
+                    if (Request.Query.page.HasValue) return Response.AsRedirect("~/", RedirectResponse.RedirectType.Permanent);
+                    pageIndex = 1;
+                }
 
                 var blog = blogService.GetBlog();
                 ViewBag.blog = blog;
-
-                var articles = blogService.GetArticles(pageIndex, Convert.ToInt32(blog.pageSize), includeHidden: (bool)ViewBag.isAdmin);
+                ViewBag.pageSize = Convert.ToInt32(blog.pageSize);
+                var articles = blogService.GetArticles(pageIndex, ViewBag.pageSize.Value, includeHidden: (bool)ViewBag.isAdmin);
                 ViewBag.articles = articles.Item1;
                 ViewBag.totalArticles = articles.Item2;
                 ViewBag.singleArticle = false;
+                ViewBag.pageIndex = pageIndex;
+                ViewBag.hasNextPage = pageIndex * ViewBag.pageSize.Value < ViewBag.totalArticles.Value;
 
                 return View["index"];
             };

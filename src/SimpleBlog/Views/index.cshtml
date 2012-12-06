@@ -2,8 +2,14 @@
     Layout = "_layout.cshtml";
 
     var articles = ViewBag.articles.Value;
+    bool hasNextPage = ViewBag.hasNextPage;
+    int pageIndex = ViewBag.pageIndex;
 }
 @foreach (var article in articles)
 {
     @Html.Partial("_article", article)
+}
+@if (hasNextPage)
+{
+    <a href="?page=@(pageIndex + 1)">Older Posts</a>
 }

@@ -5,6 +5,8 @@
     Bundles.Reference("assets/javascripts/main.js");
     
     var blog = ViewBag.blog.Value;
+    DateTime currentTime = ViewBag.currentTime;
+    bool singleArticle = ViewBag.singleArticle;
 }
 
 <!DOCTYPE html>
@@ -28,6 +30,11 @@
             </span>
         </header>
         <div id="container">
+            @if (singleArticle) {
+               <time>Posted @currentTime.ToString("MMMM dd, yyyy")</time>
+            } else {
+                <time>@currentTime.ToString("MMMM dd, yyyy")</time>
+            }
             <div id="content">@RenderBody()
             </div>
         </div>
