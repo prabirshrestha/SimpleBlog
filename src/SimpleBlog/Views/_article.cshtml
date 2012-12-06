@@ -6,15 +6,18 @@
     DateTime currentTime = ViewBag.currentTime.Value;
 }
 <section>
-    <h2><a href="@Url.Content("~/" + Model.slug)">@Model.title</a></h2>
-    <div>@Html.Raw(Model.html)</div>
+    <div class="post contain">
+        <h1><a href="@Model.slug">@Model.title</a></h1>
+        <div>@Html.Raw(Model.html)</div>
+    </div>
     @if (singleArticle && Model.comments && !string.IsNullOrWhiteSpace(blog.disqusShortName))
     {
+        <a class="button space-top space-down" href="../">Back to Blog</a>
+         @if (isAdmin)
+         {
+            <a href="#">edit</a>
+         }
         <div id="disqus_thread"></div>
         <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-    }
-    @if (isAdmin)
-    {
-        <a href="#">edit</a>
     }
 </section>
