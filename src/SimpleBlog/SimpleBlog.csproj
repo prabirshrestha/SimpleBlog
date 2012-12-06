@@ -114,6 +114,7 @@
     <Compile Include="CassetteConfiguration.cs" />
     <Content Include="Views\_googleAnalyticsScript.cshtml" />
     <Content Include="Views\index.cshtml" />
+    <None Include="assets\stylesheets\obtvse.less" />
     <None Include="Views\_disqusScript.cshtml" />
     <None Include="Views\article.cshtml" />
     <None Include="Views\_article.cshtml" />
