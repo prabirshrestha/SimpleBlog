@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using Nancy;
     using Nancy.Responses;
@@ -62,10 +63,15 @@
                 var article = blogService.GetArticleBySlug(x.slug.Value, includeHidden: ViewBag.isAdmin.Value);
                 if (article == null) return 404;
                 ViewBag.article = article;
+                var date = article.date;
 
                 ViewBag.singleArticle = true;
 
                 return Negotiate
+                    .WithMediaRangeModel("application/json", () => {
+                        article.date = ConvertToIso8601Date(date);
+                        return (object)article;
+                    })
                     .WithModel((object)article)
                     .WithView("article");
             };
@@ -83,6 +89,11 @@
             Get["/category/{category}"] = x => "category";
 
             Get["/rss"] = x => "rss";
+        }
+
+        private static string ConvertToIso8601Date(DateTime dt)
+        {
+            return dt.ToString(@"yyyy-MM-dd\THH:mm:ss.FFFFFFF\Z", CultureInfo.InvariantCulture);
         }
     }
 }
