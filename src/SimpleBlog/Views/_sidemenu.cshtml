@@ -8,5 +8,8 @@
     @if (!string.IsNullOrWhiteSpace(blog.github)) {
         <li><a href="https://github.com/@blog.github">github</a></li>
     }
+    @if (!string.IsNullOrWhiteSpace(blog.email)) {
+        <li><a href="mailto:@blog.email?subject=blog: whats up!">say hi</a></li>
+    }
     <li><a href="@Url.Content("~/rss")">rss feed</a></li>
 </ul>
