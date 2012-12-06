@@ -6,7 +6,6 @@
     using Nancy.Responses;
     using SimpleBlog.Service;
     using System.Linq;
-    using Nancy.Extensions;
 
     public class BlogModule : NancyModule
     {
@@ -69,6 +68,10 @@
                 return Negotiate
                     .WithModel((object)article)
                     .WithView("article");
+            };
+
+            Get["/{slug}/edit"] = x => {
+                return "edit";
             };
 
             Get["/{slug}/{file}"] = x => "static file";
