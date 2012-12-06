@@ -103,6 +103,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\articles\welcome\attachment.txt" />
     <Content Include="assets\javascripts\header.js" />
     <Content Include="assets\javascripts\main.js" />
     <Content Include="assets\javascripts\_vendors\jquery.js" />

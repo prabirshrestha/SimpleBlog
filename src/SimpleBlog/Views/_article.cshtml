@@ -26,7 +26,9 @@
         </div>
     </div>
     @if (singleArticle && Model.comments && !string.IsNullOrWhiteSpace(blog.disqusShortName)) {
-        <div id="disqus_thread"></div>
-        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <div id="comment">
+            <div id="disqus_thread"></div>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </div>
     }
 </section>

@@ -1,6 +1,7 @@
 ﻿namespace SimpleBlog.Service
 {
     using System;
+    using System.IO;
 
     public interface ISimpleBlogService
     {
@@ -12,6 +13,7 @@
 
         string GenerateSlug(string str);
         string TransformContent(string content);
-        dynamic GetArticleBySlug(string slug);
+        dynamic GetArticleBySlug(string slug, bool includeHidden);
+        Stream GetAttachmentForSlug(string slug, string file, bool includeHidden);
     }
 }

@@ -68,8 +68,10 @@
             {
                 dynamic metadata = PreProcessMetadata(ReadFile(file));
 
-                if (!metadata.ContainsKey("title")) throw new ApplicationException("title required for " + GetFileNameWithoutExtension(file));
-                if (!metadata.ContainsKey("date")) throw new ApplicationException("date required for " + GetFileNameWithoutExtension(file));
+                var fileNameWithoutExtension = GetFileNameWithoutExtension(file);
+                metadata.id = fileNameWithoutExtension;
+                if (!metadata.ContainsKey("title")) throw new ApplicationException("title required for " + fileNameWithoutExtension);
+                if (!metadata.ContainsKey("date")) throw new ApplicationException("date required for " + fileNameWithoutExtension);
                 metadata.date = ParseAsDateTime(metadata.date);
 
                 if (!metadata.ContainsKey("slug")) metadata.slug = GenerateSlug(metadata.title);
@@ -116,12 +118,32 @@
             return this.markdown.Transform(content);
         }
 
-        public dynamic GetArticleBySlug(string slug)
+        public dynamic GetArticleBySlug(string slug, bool includeHidden)
         {
-            var article = GetAllArticles().SingleOrDefault(a => a.slug == slug);
+            var articles = GetAllArticles().Where(a => a.date < CurrentTime);
+
+            if (!includeHidden)
+            {
+                articles = articles.Where(a => a.draft == false);
+            }
+
+            var article = articles.SingleOrDefault(a => a.slug == slug);
             if (article == null) return null;
+
             article.html = TransformContent(article.raw);
             return article;
+        }
+
+        public Stream GetAttachmentForSlug(string slug, string file, bool includeHidden)
+        {
+            var article = GetArticleBySlug(slug, includeHidden);
+            if (article == null) return null;
+
+            var path = CombinePath(this.DataPath, "articles", article.id, file);
+            if (!FileExists(path))
+                return null;
+
+            return GetFileReadStream(path);
         }
 
         private static string RemoveAccent(string txt)
@@ -162,9 +184,19 @@
             return Path.Combine(paths);
         }
 
+        protected bool FileExists(string path)
+        {
+            return File.Exists(path);
+        }
+
         protected string ReadFile(string path)
         {
             return File.ReadAllText(path);
+        }
+
+        protected Stream GetFileReadStream(string path)
+        {
+            return File.OpenRead(path);
         }
 
         protected string[] GetFiles(string path, string searchPattern)

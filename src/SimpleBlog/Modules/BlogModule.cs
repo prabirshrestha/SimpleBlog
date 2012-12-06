@@ -59,7 +59,7 @@
                 var blog = blogService.GetBlog();
                 ViewBag.blog = blog;
 
-                var article = blogService.GetArticleBySlug(x.slug);
+                var article = blogService.GetArticleBySlug(x.slug.Value, includeHidden: ViewBag.isAdmin.Value);
                 if (article == null) return 404;
                 ViewBag.article = article;
 
@@ -74,7 +74,11 @@
                 return "edit";
             };
 
-            Get["/{slug}/{file}"] = x => "static file";
+            Get["/{slug}/{file}"] = x => {
+                var attachment = blogService.GetAttachmentForSlug(x.slug, x.file, includeHidden: ViewBag.isAdmin.Value);
+                if (attachment == null) return 404;
+                return new StreamResponse(() => attachment, (string)MimeTypes.GetMimeType(x.file));
+            };
 
             Get["/category/{category}"] = x => "category";
 
