@@ -2,6 +2,7 @@
     Layout = "_layout.cshtml";
 
     var articles = ViewBag.articles.Value;
+    var hasPreviousPage = ViewBag.hasPreviousPage;
     bool hasNextPage = ViewBag.hasNextPage;
     int pageIndex = ViewBag.pageIndex;
 }
@@ -9,7 +10,9 @@
 {
     @Html.Partial("_article", article)
 }
-@if (hasNextPage)
-{
+@if (hasPreviousPage) {
+    <a href="?page=@(pageIndex - 1)">Newer Posts</a>
+}
+@if (hasNextPage) {
     <a href="?page=@(pageIndex + 1)">Older Posts</a>
 }
