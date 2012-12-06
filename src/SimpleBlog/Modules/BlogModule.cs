@@ -1,8 +1,7 @@
 ﻿namespace SimpleBlog.Modules
 {
+    using System;
     using Nancy;
-    using Nancy.Extensions;
-    using SimpleBlog.Models;
     using SimpleBlog.Service;
 
     public class BlogModule : NancyModule
@@ -10,64 +9,48 @@
         public BlogModule(ISimpleBlogService blogService)
         {
             Before += ctx => {
-                ViewBag.IsAdmin = Context.CurrentUser != null;
-                ViewBag.Blog = blogService.GetBlog();
+                ViewBag.currentTime = blogService.CurrentTime;
+                ViewBag.isAdmin = Context.CurrentUser != null;
                 return null;
             };
 
-            Get["/(rss)?"] = x => {
+            Get["/"] = x => {
                 int pageIndex;
                 int.TryParse(Request.Query.page, out pageIndex);
 
-                var viewModel = new ArticlesViewModel {
-                    Blog = ViewBag.Blog.Value
-                };
+                if (pageIndex <= 0) pageIndex = 1;
 
-                var articlesPaged = blogService.GetArticles(pageIndex, viewModel.Blog.PageSize, includeHidden: (bool)ViewBag.IsAdmin);
-                viewModel.TotalArticles = articlesPaged.Item1;
-                viewModel.Articles = articlesPaged.Item2;
+                var blog = blogService.GetBlog();
+                ViewBag.blog = blog;
 
-                ViewBag.SinglePost = false;
+                var articles = blogService.GetArticles(pageIndex, Convert.ToInt32(blog.pageSize), includeHidden: (bool)ViewBag.isAdmin);
+                ViewBag.articles = articles.Item1;
+                ViewBag.totalArticles = articles.Item2;
+                ViewBag.singleArticle = false;
 
-                var negotiater = Negotiate
-                    .WithMediaRangeModel("application/javascript", viewModel).WithView("articles/rss/jsonp/index")
-                    .WithMediaRangeModel("application/json", viewModel).WithView("articles/rss/json/index");
-
-                if (Request.Path == Context.ToFullPath("~/rss"))
-                {
-                    // if /rss make xml the default
-                    negotiater = negotiater
-                        .WithMediaRangeModel("text/html", viewModel).WithView("articles/articles")
-                        .WithMediaRangeModel("application/xml", viewModel).WithView("articles/rss/xml/index");
-                }
-                else
-                {
-                    // else make html the default
-                    negotiater = negotiater
-                        .WithMediaRangeModel("application/xml", viewModel).WithView("articles/rss/xml/index")
-                        .WithMediaRangeModel("text/html", viewModel).WithView("articles/articles");
-                }
-
-                return negotiater;
+                return View["index"];
             };
 
             Get["/{slug}"] = x => {
-                Article article = blogService.GetArticleBySlug(x.slug, includeHidden: ViewBag.IsAdmin);
+                var blog = blogService.GetBlog();
+                ViewBag.blog = blog;
 
+                var article = blogService.GetArticleBySlug(x.slug);
                 if (article == null) return 404;
+                ViewBag.article = article;
 
-                ViewBag.SinglePost = true;
+                ViewBag.singleArticle = true;
 
                 return Negotiate
-                    .WithMediaRangeModel("application/xml", article)
-                    .WithMediaRangeModel("application/javascript", article)
-                    .WithMediaRangeModel("application/json", article)
-                    .WithMediaRangeModel("text/html", article).WithView("articles/article");
+                    .WithModel((object)article)
+                    .WithView("article");
             };
 
-            Get["/{slug}/{file}"] = x => {
-                return "requested file " + x.file + " for article " + x.slug;
-            };
+            Get["/{slug}/{file}"] = x => "static file";
+
+            Get["/category/{category}"] = x => "category";
+
+            Get["/rss"] = x => "rss";
         }
     }
 }

@@ -22,7 +22,7 @@ namespace SimpleBlog
 
         public void Configure(BundleCollection bundles)
         {
-            // Please read http://getcassette.net/documentation/configuration
+            //// Please read http://getcassette.net/documentation/configuration
             bundles.Add<StylesheetBundle>("assets/stylesheets/style.less");
 
             var sprockets = new Sprockets.Sprockets();

@@ -1,0 +1,20 @@
+﻿@using System
+@{
+    bool isAdmin = ViewBag.isAdmin;
+    var blog = ViewBag.blog.Value;
+    bool singleArticle = ViewBag.singleArticle.Value;
+    DateTime currentTime = ViewBag.currentTime.Value;
+}
+<section>
+    <h2><a href="@Url.Content("~/" + Model.slug)">@Model.title</a></h2>
+    <div>@Html.Raw(Model.html)</div>
+    @if (singleArticle && Model.comments && !string.IsNullOrWhiteSpace(blog.disqusShortName))
+    {
+        <div id="disqus_thread"></div>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    }
+    @if (isAdmin)
+    {
+        <a href="#">edit</a>
+    }
+</section>

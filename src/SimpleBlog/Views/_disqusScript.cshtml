@@ -1,10 +1,11 @@
 ﻿@{
-    var blog = ViewBag.Blog.Value;
+    var blog = ViewBag.blog.Value;
+    bool singleArticle = ViewBag.singleArticle;
 }
-@if (ViewBag.SinglePost && !string.IsNullOrWhiteSpace(blog.Metadata.DisqusShortName))
+@if (singleArticle && !string.IsNullOrWhiteSpace(blog.disqusShortName))
 {
     <script>
-        var disqus_shortname = '@blog.Metadata.DisqusShortName';
+        var disqus_shortname = '@blog.disqusShortName';
         (function () {
             var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
             dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';

@@ -8,12 +8,14 @@
     using System.Text.RegularExpressions;
     using MarkdownDeep;
     using Nancy;
-    using SimpleBlog.Models;
 
     public class SimpleBlogFileSystemService : ISimpleBlogService
     {
-        private readonly Regex markdownHeaderRegex = new Regex(@"(.*):(.*)\n", RegexOptions.Compiled | RegexOptions.Multiline);
         private readonly Markdown markdown = new Markdown();
+
+        private static readonly string[] DateFormats = new[] {
+            "ddd MMM dd yyyy HH:mm:ss 'GMT'zzz"
+        };
 
         public SimpleBlogFileSystemService(IRootPathProvider rootPathProvider)
             : this(Path.Combine(rootPathProvider.GetRootPath(), "App_Data"))
@@ -27,63 +29,73 @@
 
         public string DataPath { get; private set; }
 
-        public DateTime CurrentTime { get { return DateTime.UtcNow; } }
+        public virtual DateTime CurrentTime { get { return DateTime.UtcNow; } }
 
-        public Blog GetBlog()
+        public dynamic GetBlog()
         {
-            string body;
-            var blog = new Blog {
-                Metadata = this.PreProcessMetadata(ReadFile(CombinePath(DataPath, "blog")), out body),
-            };
-            blog.Metadata.Remove("RawContent");
-            return blog;
+            var metadata = this.PreProcessMetadata(ReadFile(CombinePath(DataPath, "config")));
+            if (metadata.ContainsKey("raw")) metadata.Remove("raw");
+            if (!metadata.ContainsKey("pageSize")) metadata.pageSize = 5L;
+            return metadata;
         }
 
-        public Tuple<long, IEnumerable<Article>> GetArticles(int pageIndex, int pageSize, bool includeHidden)
+        public Tuple<dynamic, long> GetArticles(int pageIndex, int pageSize, bool includeHidden)
         {
-            if (pageIndex <= 0)
-            {
-                pageIndex = 1;
-            }
-
-            if (pageSize <= 0)
-            {
-                pageSize = 5;
-            }
-
-            var currentTime = CurrentTime;
-
             var articles = GetAllArticles();
-            if (!includeHidden)
+
+            foreach (var article in articles)
             {
-                articles = articles.Where(article => article.IsHidden(currentTime));
+                article.html = TransformContent(article.raw);
             }
 
-            var total = articles.LongCount();
-
-            articles = articles.Skip((pageIndex - 1) * pageSize).Take(pageSize);
-
-            return new Tuple<long, IEnumerable<Article>>(total, articles);
+            return new Tuple<dynamic, long>(articles, articles.Count);
         }
 
-        public Article GetArticleBySlug(string slug, bool includeHidden)
+        private IList<dynamic> GetAllArticles()
         {
-            var article = GetAllArticles().SingleOrDefault(a => a.Slug == slug);
-            if (article == null)
-                return null;
+            var articlesFolder = CombinePath(DataPath, "articles");
+            var files = Directory.GetFiles(articlesFolder, "*.markdown");
 
-            if (includeHidden)
+            var articles = new JsonArray();
+
+            foreach (var file in files)
             {
-                if (article.IsHidden(CurrentTime))
-                    return null;
+                dynamic metadata = PreProcessMetadata(ReadFile(file));
+
+                if (!metadata.ContainsKey("title")) throw new ApplicationException("title required for " + GetFileNameWithoutExtension(file));
+                if (!metadata.ContainsKey("date")) throw new ApplicationException("date required for " + GetFileNameWithoutExtension(file));
+
+                if (!metadata.ContainsKey("slug")) metadata.slug = GenerateSlug(metadata.title);
+                if (!metadata.ContainsKey("draft")) metadata.draft = false;
+                if (!metadata.ContainsKey("comments")) metadata.comments = true;
+
+                metadata.date = ParseAsDateTime(metadata.date);
+                articles.Add(metadata);
             }
 
-            return article;
+            return articles;
         }
 
-        public string GenerateSlug(string input)
+        private DateTime ParseAsDateTime(dynamic date)
         {
-            string str = RemoveAccent(input).ToLower();
+            string dt = date ?? string.Empty;
+            if (dt.Contains("("))
+            {
+                dt = dt.Substring(0, dt.LastIndexOf(" ", StringComparison.Ordinal));
+            }
+
+            DateTime dateTime;
+            if (!DateTime.TryParseExact(dt, DateFormats, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dateTime))
+            {
+                return DateTime.MaxValue;
+            }
+
+            return dateTime;
+        }
+
+        public string GenerateSlug(string str)
+        {
+            str = RemoveAccent(str).ToLower();
 
             str = Regex.Replace(str, @"[^a-z0-9\s-]", ""); // invalid chars           
             str = Regex.Replace(str, @"\s+", " ").Trim(); // convert multiple spaces into one space   
@@ -93,70 +105,50 @@
             return str;
         }
 
+        public virtual string TransformContent(string content)
+        {
+            return this.markdown.Transform(content);
+        }
+
+        public dynamic GetArticleBySlug(string slug)
+        {
+            var article = GetAllArticles().SingleOrDefault(a => a.slug == slug);
+            if (article == null) return null;
+            article.html = TransformContent(article.raw);
+            return article;
+        }
+
         private static string RemoveAccent(string txt)
         {
             byte[] bytes = System.Text.Encoding.GetEncoding("Cyrillic").GetBytes(txt);
             return System.Text.Encoding.ASCII.GetString(bytes);
         }
 
-        private IEnumerable<Article> GetAllArticles()
+        public virtual dynamic PreProcessMetadata(string contents)
         {
-            var articlesFolder = CombinePath(DataPath, "articles");
-            var files = Directory.GetFiles(articlesFolder, "*.markdown");
-
-            var articles = new List<Article>();
-            foreach (var file in files)
+            using (var reader = new StringReader(contents))
             {
-                string content;
-                var metadata = PreProcessMetadata(ReadFile(file), out content);
-
-                var article = new Article {
-                    Metadata = metadata,
-                    RawContent = content,
-                    HtmlContent = TransformContent(content)
-                };
-
-                if (!metadata.ContainsKey("Slug"))
+                var dict = new JsonObject();
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
-                    article.Slug = GenerateSlug(metadata.Title);
+                    if (string.IsNullOrWhiteSpace(line))
+                    {
+                        dict["raw"] = reader.ReadToEnd();
+                        break;
+                    }
+                    else
+                    {
+                        var split = line.Split(new[] { ':' }, 2);
+                        if (split.Length == 2)
+                            dict[split[0].Trim()] = split[1].Trim();
+                    }
                 }
 
-                articles.Add(article);
+                if (!dict.ContainsKey("raw")) dict["raw"] = string.Empty;
+
+                return dict;
             }
-
-            // sort descending
-            articles.Sort(new Comparison<dynamic>((x, y) => {
-                DateTime xDateTime = x.DateTime;
-                DateTime yDateTime = y.DateTime;
-
-                return yDateTime.CompareTo(xDateTime);
-            }));
-
-            return articles;
-        }
-
-        public virtual dynamic PreProcessMetadata(string contents, out string body)
-        {
-            var match = this.markdownHeaderRegex.Match(contents);
-
-            var dict = new DynamicDictionary();
-            int length = 0;
-            while (match.Success)
-            {
-                dict[match.Groups[1].Value] = match.Groups[2].Value;
-                length += match.Length;
-                match = match.NextMatch();
-            }
-
-            body = contents.Substring(length);
-            dict["RawContent"] = body;
-            body = this.TransformContent(body);
-            return dict;
-        }
-
-        public virtual string TransformContent(string input)
-        {
-            return this.markdown.Transform(input);
         }
 
         protected string CombinePath(params string[] paths)
