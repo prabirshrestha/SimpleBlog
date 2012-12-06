@@ -1,0 +1,50 @@
+﻿@{
+    Bundles.Reference("assets/stylesheets/style.less");
+    Bundles.Reference("assets/javascripts/header.js");
+    Bundles.Reference("assets/javascripts/_vendors/jquery.js");
+    Bundles.Reference("assets/javascripts/main.js");
+    
+    var blog = ViewBag.blog.Value;
+    DateTime currentTime = ViewBag.currentTime;
+    bool singleArticle = ViewBag.singleArticle;
+}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>@blog.title</title>
+        <meta name="author" content="@blog.author">
+        <meta name="viewport" content="width=device-width">
+        @Bundles.RenderStylesheets()
+        @Bundles.RenderScripts("header")
+        @RenderSection("header", required: false)
+        <link href='http://fonts.googleapis.com/css?family=Lato:300,900' rel='stylesheet' type='text/css' />
+        <link href="@Url.Content("~/rss")" rel="alternate" title="RSS" type="application/rss+xml" />
+    </head>
+    <body>
+        <header>
+            <h1><a href="@Url.Content("~/")">@blog.title</a></h1>
+            <span>@blog.tagLine</span>
+            @Html.Partial("_sidemenu")
+            <span class="powered-by">
+                Powered by <a href="http://github.com/prabirshrestha/SimpleBlog.git">Simple Blog</a> and <a href="http://nancyfx.org">Nancy</a>
+            </span>
+        </header>
+        <div id="container">
+            @if (singleArticle) {
+               <time>Posted @currentTime.ToString("MMMM dd, yyyy")</time>
+            } else {
+                <time>@currentTime.ToString("MMMM dd, yyyy")</time>
+            }
+            <div id="content">@RenderBody()
+            </div>
+        </div>
+        @Html.Partial("_disqusScript")
+        @Html.Partial("_googleAnalyticsScript")
+@*        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="@Bundles.Url("assets/javascripts/_vendors/jquery.js")"><\/script>')</script>
+        @Bundles.RenderScripts("app")*@
+    </body>
+</html>

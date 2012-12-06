@@ -1,0 +1,24 @@
+﻿@{
+    Layout = "_layout.cshtml";
+
+    var articles = ViewBag.articles.Value;
+    var hasPreviousPage = ViewBag.hasPreviousPage;
+    bool hasNextPage = ViewBag.hasNextPage;
+    int pageIndex = ViewBag.pageIndex;
+}
+@foreach (var article in articles)
+{
+    @Html.Partial("_article", article)
+}
+<nav class="pagination">
+    <span class="prev">
+    @if (hasPreviousPage) {
+        <a rel="prev" href="?page=@(pageIndex - 1)">Newer Posts</a>
+    }
+    </span>
+    <span class="next">
+         @if (hasNextPage) {
+            <a rel="next" href="?page=@(pageIndex + 1)">Older Posts</a>
+        }
+    </span>
+</nav>
