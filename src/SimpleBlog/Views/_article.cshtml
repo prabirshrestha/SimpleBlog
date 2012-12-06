@@ -7,7 +7,12 @@
 }
 <section>
     <div class="post contain">
-        <h1><a href="@Model.slug">@Model.title</a></h1>
+        @if (singleArticle) {
+            <h1>@Model.title</h1>
+        }
+        else {
+            <h1><a href="@Model.slug">@Model.title</a></h1>
+        }
         <div>@Html.Raw(Model.html)</div>
     </div>
     @if (singleArticle && Model.comments && !string.IsNullOrWhiteSpace(blog.disqusShortName))
