@@ -10,9 +10,15 @@
 {
     @Html.Partial("_article", article)
 }
-@if (hasPreviousPage) {
-    <a href="?page=@(pageIndex - 1)">Newer Posts</a>
-}
-@if (hasNextPage) {
-    <a href="?page=@(pageIndex + 1)">Older Posts</a>
-}
+<nav class="pagination">
+    <span class="prev">
+    @if (hasPreviousPage) {
+        <a rel="prev" href="?page=@(pageIndex - 1)">Newer Posts</a>
+    }
+    </span>
+    <span class="next">
+         @if (hasNextPage) {
+            <a rel="next" href="?page=@(pageIndex + 1)">Older Posts</a>
+        }
+    </span>
+</nav>
